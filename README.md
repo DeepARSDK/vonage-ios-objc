@@ -10,3 +10,10 @@ To run the sample:
 4) Run pod install
 5) Sign up on https://www.vonage.com/communications-apis/video and either create a new project or use an existing project. create a project
 6) Go to your project page and scroll down to the Project Tools section. From there, you can generate a session ID and token manually. Use the project’s API key along with the session ID and token you generated.
+7) To quickly test the demo go to https://tokbox.com/developer/tools/playground/ on another device (e.g. desktop) to create a conversation room where you can see the feed from test app:
+	- On the playground choose "Create new session"
+	- Enter your API key
+	- Choose latest JS SDK and leave other options unchanged
+	- Click "Create" and on the next screen select Connect
+	- Now in your session playground screen select "Publish stream" and "Continue" in the next dialog (you don't need to set any options)
+	- Now you should be able to view the stream from your device where you created the Playground session and if you run the example iOS app the app should connect once you click Start call (and give all required permissions to the app, like microphone)
