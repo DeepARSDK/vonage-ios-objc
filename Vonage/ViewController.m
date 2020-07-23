@@ -28,6 +28,8 @@ static NSString* const kToken = @"";
 }
 
 @property (nonatomic, strong) ARView* arview;
+@property (nonatomic, strong) CameraController* cameraController;
+
 
 @end
 
@@ -44,9 +46,12 @@ static NSString* const kToken = @"";
 
     self.arview.delegate = self;
     [self.view insertSubview:self.arview atIndex:0];
+    
+    self.cameraController = [[CameraController alloc] init];
+    self.cameraController.arview = self.arview;
 
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    [self.arview initializeWithCaptureSessionPreset:AVCaptureSessionPreset1280x720 orientation:orientation cameraPosition:AVCaptureDevicePositionFront];
+    [self.arview initialize];
+    [self.cameraController startCamera];
     
     UIButton* startCall = [[UIButton alloc] init];
     startCall.translatesAutoresizingMaskIntoConstraints = NO;
@@ -59,6 +64,24 @@ static NSString* const kToken = @"";
     [startCall.widthAnchor constraintEqualToConstant:100].active = YES;
     [startCall.heightAnchor constraintEqualToConstant:100].active = YES;
     [startCall addTarget:self action:@selector(startCall) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self  selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification  object:nil];
+}
+
+- (void)orientationChanged:(NSNotification *)notification {
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (orientation == UIInterfaceOrientationLandscapeLeft) {
+        self.cameraController.videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
+    } else if (orientation == UIInterfaceOrientationLandscapeRight) {
+        self.cameraController.videoOrientation = AVCaptureVideoOrientationLandscapeRight;
+    } else if (orientation == UIInterfaceOrientationPortrait) {
+        self.cameraController.videoOrientation = AVCaptureVideoOrientationPortrait;
+    } else if (orientation == UIInterfaceOrientationPortraitUpsideDown) {
+        self.cameraController.videoOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
+    }
 }
 
 - (void)startCall {
@@ -210,7 +233,8 @@ static NSString* const kToken = @"";
 
 - (void)didInitialize {
     [self.arview switchEffectWithSlot:@"effect" path:[[NSBundle mainBundle] pathForResource:@"lion" ofType:@""]];
-    [self.arview startFrameOutputWithXmin:0 Xmax:1 Ymin:0 Ymax:1 scale:1];
+    // We use 0 for height which means it will auto calculate height based on the provided width
+    [self.arview startFrameOutputWithOutputWidth:640 outputHeight:0 subframe:CGRectMake(0, 0, 1, 1 )];
 }
 
 - (void)frameAvailable:(CMSampleBufferRef)sampleBuffer {
@@ -219,6 +243,8 @@ static NSString* const kToken = @"";
         if(_videoCapturer){
             [_videoCapturer pushFrame:pb];
         }
+        
+        CFRelease(sampleBuffer);
     }
 }
 @end
