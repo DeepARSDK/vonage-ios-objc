@@ -243,8 +243,6 @@ static NSString* const kToken = @"";
         if(_videoCapturer){
             [_videoCapturer pushFrame:pb];
         }
-        
-        CFRelease(sampleBuffer);
     }
 }
 @end
