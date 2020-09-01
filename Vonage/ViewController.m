@@ -20,7 +20,7 @@ static NSString* const kSessionId = @"";
 // Replace with your generated token
 static NSString* const kToken = @"";
 
-@interface ViewController () <ARViewDelegate, OTSessionDelegate, OTSubscriberKitDelegate, OTPublisherDelegate> {
+@interface ViewController () <DeepARDelegate, OTSessionDelegate, OTSubscriberKitDelegate, OTPublisherDelegate> {
     OTSession* _session;
     OTPublisher* _publisher;
     OTSubscriber* _subscriber;
@@ -205,7 +205,7 @@ static NSString* const kToken = @"";
     [self cleanupPublisher];
 }
 
-# pragma mark - ARViewDelegate
+# pragma mark - DeepARDelegate
 
 - (void)didFinishPreparingForVideoRecording {
     
