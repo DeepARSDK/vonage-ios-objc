@@ -30,6 +30,8 @@ static NSString* const kToken = @"";
 @property (nonatomic, strong) ARView* arview;
 @property (nonatomic, strong) CameraController* cameraController;
 
+@property (nonatomic, assign) NSInteger currentFilterIndex;
+
 
 @end
 
@@ -38,6 +40,7 @@ static NSString* const kToken = @"";
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.currentFilterIndex = 0;
     _session = [[OTSession alloc] initWithApiKey:kApiKey sessionId:kSessionId delegate:self];
 
     self.arview = [[ARView alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -64,6 +67,39 @@ static NSString* const kToken = @"";
     [startCall.widthAnchor constraintEqualToConstant:100].active = YES;
     [startCall.heightAnchor constraintEqualToConstant:100].active = YES;
     [startCall addTarget:self action:@selector(startCall) forControlEvents:UIControlEventTouchUpInside];
+
+    UIButton* changeFilter = [[UIButton alloc] init];
+    changeFilter.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:changeFilter];
+    [changeFilter setTitle:@"Change filter" forState:UIControlStateNormal];
+    [changeFilter setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+    [changeFilter.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:50].active = YES;
+    [changeFilter.rightAnchor constraintEqualToAnchor:self.view.rightAnchor constant:-20].active = YES;
+    [changeFilter.widthAnchor constraintEqualToConstant:120].active = YES;
+    [changeFilter.heightAnchor constraintEqualToConstant:50].active = YES;
+    [changeFilter addTarget:self action:@selector(changeFilter) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)changeFilter {
+    NSArray* filters = @[
+        @"lion",
+        @"beach1",
+        @"beach2",
+        @"beach3",
+        @"bg_blue",
+        @"bg_green",
+        @"bg_pink",
+        @"bg_white",
+        @"bg_yellow",
+        @"blur_high",
+        @"blur_light",
+        @"livingroom",
+        @"office"
+    ];
+
+    self.currentFilterIndex = (self.currentFilterIndex+1) % filters.count;
+    NSString* nextFilter = filters[self.currentFilterIndex];
+    [self.arview switchEffectWithSlot:@"effect" path:[[NSBundle mainBundle] pathForResource:nextFilter ofType:@""]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -243,8 +279,6 @@ static NSString* const kToken = @"";
         if(_videoCapturer){
             [_videoCapturer pushFrame:pb];
         }
-        
-        CFRelease(sampleBuffer);
     }
 }
 @end
